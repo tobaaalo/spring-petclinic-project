@@ -8,7 +8,11 @@ pipeline {
     
     environment {
         APP_NAME = "spring-petclinic-project"
-        RELEASE = "1.0.0"
+            RELEASE = "1.0.0"
+            DOCKER_USER = "tobaalo"
+            DOCKER_PASS = 'dockerhub'
+            IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+            IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
     
@@ -66,20 +70,13 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    // Use Jenkins credentials for Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub',
-                                                     usernameVariable: 'DOCKER_USER',
-                                                     passwordVariable: 'DOCKER_PASS')]) {
-                        def IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-                        
-                        // Build Docker image
-                        def docker_image = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                        
-                        // Push to Docker Hub
-                        docker.withRegistry('', DOCKER_PASS) {
-                            docker_image.push("${IMAGE_TAG}")
-                            docker_image.push('latest')
-                        }
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')                        }
                     }
                 }
             }
