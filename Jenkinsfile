@@ -6,14 +6,11 @@ pipeline {
     }
     
     environment {
-    APP_NAME = "spring-petclinic-project"
-    RELEASE = "1.0.0"
-    DOCKER_USER = "tobaalo"
-    DOCKER_PASS = credentials("dockerhub")  // If you stored Docker password as Jenkins credentials
-    IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
-    IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-    JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
-}
+        APP_NAME = "spring-petclinic-project"
+        RELEASE = "1.0.0"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
+    }
     
     stages {
         stage("Cleanup Workspace") {
@@ -61,10 +58,15 @@ pipeline {
         stage("Build & Push Docker Image") {
             steps {
                 script {
-                    docker.withRegistry('', DOCKER_PASS) {
-                        docker_image = docker.build("${IMAGE_NAME}")
-                        docker_image.push("${IMAGE_TAG}")
-                        docker_image.push('latest')
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', 
+                                                     usernameVariable: 'DOCKER_USER', 
+                                                     passwordVariable: 'DOCKER_PASS')]) {
+                        def IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+                        docker.withRegistry('', DOCKER_PASS) {
+                            def docker_image = docker.build("${IMAGE_NAME}")
+                            docker_image.push("${IMAGE_TAG}")
+                            docker_image.push('latest')
+                        }
                     }
                 }
             }
