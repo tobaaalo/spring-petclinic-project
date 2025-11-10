@@ -9,7 +9,6 @@ pipeline {
         APP_NAME = "spring-petclinic-project"
         RELEASE = "1.0.0"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
-        JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
     }
     
     stages {
