@@ -119,15 +119,7 @@ pipeline {
             }
         }
         
-        stage("Cleanup Artifacts") {
-            steps {
-                script {
-                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
-                    sh "docker rmi ${IMAGE_NAME}:latest || true"
-                }
-            }
-        }
-        
+                
         stage("Trigger CD Pipeline") {
             steps {
                 script {
@@ -139,6 +131,15 @@ pipeline {
                         --data 'IMAGE_TAG=${IMAGE_TAG}' \
                         'https://ec2-35-178-210-128.eu-west-2.compute.amazonaws.com:8080/job/spring-pet-pipeline-cd/buildWithParameters?token=gitops-token'
                     """
+                }
+            }
+        }
+        
+        stage("Cleanup Artifacts") {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true"
+                    sh "docker rmi ${IMAGE_NAME}:latest || true"
                 }
             }
         }
