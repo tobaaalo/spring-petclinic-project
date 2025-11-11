@@ -47,8 +47,11 @@ CREATE TABLE pets (
   id         INTEGER IDENTITY PRIMARY KEY,
   name       VARCHAR(30),
   birth_date DATE,
+  owner_id INTEGER,
   type_id    INTEGER NOT NULL,
   owner_id   INTEGER
+  FOREIGN KEY (type_id) REFERENCES types(id),
+  FOREIGN KEY (owner_id) REFERENCES owners(id) -- ✅ added constraint
 );
 ALTER TABLE pets ADD CONSTRAINT fk_pets_owners FOREIGN KEY (owner_id) REFERENCES owners (id);
 ALTER TABLE pets ADD CONSTRAINT fk_pets_types FOREIGN KEY (type_id) REFERENCES types (id);

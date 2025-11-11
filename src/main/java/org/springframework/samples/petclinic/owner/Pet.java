@@ -52,6 +52,10 @@ public class Pet extends NamedEntity {
 	@JoinColumn(name = "type_id")
 	private PetType type;
 
+	@ManyToOne
+	@JoinColumn(name = "owner_id")
+	private Owner owner; // ✅ Add this missing field
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "pet_id")
 	@OrderBy("visit_date ASC")
@@ -79,6 +83,14 @@ public class Pet extends NamedEntity {
 
 	public void addVisit(Visit visit) {
 		getVisits().add(visit);
+	}
+
+	public Owner getOwner() { // ✅ Add getter
+		return this.owner;
+	}
+
+	public void setOwner(Owner owner) {
+		this.owner = owner;
 	}
 
 }
