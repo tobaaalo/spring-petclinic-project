@@ -30,6 +30,12 @@ pipeline {
                     url: 'https://github.com/tobaaalo/spring-petclinic-project.git'
             }
         }
+
+        stage('Format Code') {
+            steps {
+                sh 'mvn spring-javaformat:apply'
+            }
+}
         
         stage("Build Application") {
             steps {
