@@ -83,21 +83,20 @@ pipeline {
         }
         
         stage("Build & Push Docker Image") {
-            environment {
-                DOCKER_BUILDKIT = '1'
-            }
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
+                        // Pull the latest image to use as cache
                         try {
                             docker.image("${IMAGE_NAME}:latest").pull()
                         } catch (Exception e) {
-                            echo "No cached image found"
+                            echo "No cached image found, building from scratch"
                         }
                         
+                        // Build with cache-from (without BuildKit)
                         def docker_image = docker.build(
                             "${IMAGE_NAME}",
-                            "--cache-from ${IMAGE_NAME}:latest --build-arg BUILDKIT_INLINE_CACHE=1 ."
+                            "--cache-from ${IMAGE_NAME}:latest ."
                         )
                         
                         docker_image.push("${IMAGE_TAG}")
