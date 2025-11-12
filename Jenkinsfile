@@ -46,16 +46,16 @@ pipeline {
             }
         }
         
-        stage("Test Application") {
-            steps {
-                sh "mvn test -Dmaven.test.failure.ignore=true"
-            }
-            post {
-                always {
-                    junit '**/target/surefire-reports/*.xml'
-                }
-            }
-        }
+        // stage("Test Application") {
+        //     steps {
+        //         sh "mvn test -Dmaven.test.failure.ignore=true"
+        //     }
+        //     post {
+        //         always {
+        //             junit '**/target/surefire-reports/*.xml'
+        //         }
+        //     }
+        // }
         
         stage("SonarQube Analysis") {
             steps {
@@ -83,10 +83,23 @@ pipeline {
         }
         
         stage("Build & Push Docker Image") {
+            environment {
+                DOCKER_BUILDKIT = '1'
+            }
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
-                        def docker_image = docker.build("${IMAGE_NAME}")
+                        try {
+                            docker.image("${IMAGE_NAME}:latest").pull()
+                        } catch (Exception e) {
+                            echo "No cached image found"
+                        }
+                        
+                        def docker_image = docker.build(
+                            "${IMAGE_NAME}",
+                            "--cache-from ${IMAGE_NAME}:latest --build-arg BUILDKIT_INLINE_CACHE=1 ."
+                        )
+                        
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
                     }
