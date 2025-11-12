@@ -7,7 +7,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build without the go-offline step that's causing issues
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -P css
 
 # Stage 2: Package into a lightweight image
 FROM eclipse-temurin:17-jdk-alpine
