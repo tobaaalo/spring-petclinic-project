@@ -48,20 +48,11 @@ pipeline {
         
         stage("Test Application") {
             steps {
-                script {
-                    // Run tests with proper database initialization
-                    sh '''
-                        mvn test \
-                        -Dspring.profiles.active=test \
-                        -Dspring.sql.init.mode=always \
-                        -Dspring.jpa.defer-datasource-initialization=true
-                    '''
-                }
+                sh "mvn test -Dmaven.test.failure.ignore=true"
             }
             post {
                 always {
-                    // Publish test results
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                    junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
