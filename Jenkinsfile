@@ -126,7 +126,7 @@ pipeline {
         stage("Trigger CD Pipeline") {
             steps {
                 script {
-                    build job: 'pet-project-CD',
+                    build job: 'pet-project-CD-pipeline',
                           parameters: [
                               string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")
                           ],
